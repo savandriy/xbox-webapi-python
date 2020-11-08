@@ -33,3 +33,9 @@ async def auth_mgr(event_loop):
 @pytest.fixture(scope="function")
 def xbl_client(auth_mgr):
     return XboxLiveClient(auth_mgr)
+
+
+@pytest.fixture(scope="session")
+def ecdsa_signing_key() -> str:
+    with open("tests/data/test_signing_key.pem") as f:
+        return f.read()

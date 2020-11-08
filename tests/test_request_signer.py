@@ -26,9 +26,8 @@ def test_real():
     )
 
 
-def test_synthetic():
-    with open("tests/data/test_signing_key.pem") as f:
-        signing_key = SigningKey.from_pem(f.read())
+def test_synthetic(ecdsa_signing_key: str):
+    signing_key = SigningKey.from_pem(ecdsa_signing_key)
 
     signer = RequestSigner(signing_key)
 
@@ -75,11 +74,8 @@ def test_synthetic():
     )
 
 
-def test_import():
-    with open("tests/data/test_signing_key.pem") as f:
-        key = f.read()
-
-    signer = RequestSigner.from_pem(key)
+def test_import(ecdsa_signing_key: str):
+    signer = RequestSigner.from_pem(ecdsa_signing_key)
     export = signer.export_signing_key()
 
-    assert key == export
+    assert ecdsa_signing_key == export

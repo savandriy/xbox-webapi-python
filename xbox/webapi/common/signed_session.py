@@ -5,6 +5,7 @@ A wrapper around httpx' AsyncClient which transparently calculates the "Signatur
 """
 
 import aiohttp
+from yarl import URL
 
 from xbox.webapi.common.request_signer import RequestSigner
 
@@ -36,3 +37,10 @@ class SignedSession(aiohttp.ClientSession):
 
         request.headers["Signature"] = signature
         return request
+
+    async def send_signed(
+        self, method: str, url: str, **kwargs
+    ) -> aiohttp.ClientResponse:
+        request = aiohttp.ClientRequest(method, URL(url), **kwargs)
+        request = self.prepare_signed_request(request)
+        return self.request("<seems not the right function to use...>")
