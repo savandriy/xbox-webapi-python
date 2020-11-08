@@ -23,7 +23,7 @@ class SignedSession(aiohttp.ClientSession):
     async def prepare_signed_request(
         self, request: aiohttp.ClientRequest
     ) -> aiohttp.ClientRequest:
-        path_and_query = request.url.raw_path.decode()
+        path_and_query = request.url.raw_path
         authorization = request.headers.get("Authorization", "")
 
         body = request.body
@@ -42,5 +42,5 @@ class SignedSession(aiohttp.ClientSession):
         self, method: str, url: str, **kwargs
     ) -> aiohttp.ClientResponse:
         request = aiohttp.ClientRequest(method, URL(url), **kwargs)
-        request = self.prepare_signed_request(request)
+        request = await self.prepare_signed_request(request)
         return self.request("<seems not the right function to use...>")
