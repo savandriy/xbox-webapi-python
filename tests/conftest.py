@@ -3,6 +3,7 @@ import json
 import os
 
 from aiohttp import ClientSession
+from ecdsa.keys import SigningKey, VerifyingKey
 import pytest
 
 from xbox.webapi.api.client import XboxLiveClient
@@ -13,6 +14,7 @@ from xbox.webapi.authentication.models import (
     XSTSDisplayClaims,
     XSTSResponse,
 )
+from xbox.webapi.common.request_signer import RequestSigner
 
 from tests.common import get_response
 
@@ -36,6 +38,28 @@ def xbl_client(auth_mgr):
 
 
 @pytest.fixture(scope="session")
-def ecdsa_signing_key() -> str:
+def ecdsa_signing_key_str() -> str:
     with open("tests/data/test_signing_key.pem") as f:
         return f.read()
+
+
+@pytest.fixture(scope="session")
+def ecdsa_signing_key(ecdsa_signing_key_str: str) -> SigningKey:
+    return SigningKey.from_pem(ecdsa_signing_key_str)
+
+
+@pytest.fixture(scope="session")
+def ecdsa_verifying_key() -> VerifyingKey:
+    with open("tests/data/test/verifying_key.pem") as f:
+        key = f.read()
+    return VerifyingKey.from_pem(key)
+
+
+@pytest.fixture(scope="session")
+def synthetic_request_signer(ecdsa_signing_key) -> RequestSigner:
+    return RequestSigner(ecdsa_signing_key)
+
+
+@pytest.fixture(scope="session")
+def synthetic_timestamp() -> datetime:
+    return datetime.utcfromtimestamp(1586999965)
