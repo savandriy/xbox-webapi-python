@@ -10,19 +10,19 @@ class PresenceLevel(str, Enum):
 
 
 class LastSeen(CamelCaseModel):
-    device_type: str
-    title_id: str
-    title_name: str
-    timestamp: str
+    device_type: Optional[str]
+    title_id: Optional[str]
+    title_name: Optional[str]
+    timestamp: Optional[str]
     
 class ActivityRecord(CamelCaseModel):
     richPresence: Optional[str]
     media: Optional[str]
-    
+
 class TitleRecord(CamelCaseModel):
     id: Optional[str]
     name: Optional[str]
-    activity: Optional[List[ActivityRecord]]
+    activity: Optional[ActivityRecord]
     lastModified: Optional[str]
     placement: Optional[str]
     state: Optional[str]
