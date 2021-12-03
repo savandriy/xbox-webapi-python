@@ -5,6 +5,7 @@ Authenticate with Windows Live Server and Xbox Live.
 """
 import logging
 from typing import List, Optional
+import random
 
 import aiohttp
 from yarl import URL
@@ -26,17 +27,19 @@ DEFAULT_SCOPES = ["Xboxlive.signin", "Xboxlive.offline_access"]
 class AuthenticationManager:
     def __init__(
         self,
-        client_session: aiohttp.ClientSession,
         client_id: str,
         client_secret: str,
         redirect_uri: str,
         scopes: Optional[List[str]] = None,
+        client_session: aiohttp.ClientSession = None,
+        proxy_sessions=None
     ):
-        self.session: aiohttp.ClientSession = client_session
         self._client_id: str = client_id
         self._client_secret: str = client_secret
         self._redirect_uri: str = redirect_uri
         self._scopes: List[str] = scopes or DEFAULT_SCOPES
+        self.session: aiohttp.ClientSession = client_session
+        self.proxy_sessions = proxy_sessions
 
         self.oauth: OAuth2TokenResponse = None
         self.user_token: XAUResponse = None
@@ -78,7 +81,20 @@ class AuthenticationManager:
         url = "https://title.mgt.xboxlive.com/titles/default/endpoints"
         headers = {"x-xbl-contract-version": "1"}
         params = {"type": 1}
-        resp = await self.session.get(url, headers=headers, params=params)
+        if self.proxy_sessions:
+            while True:
+                session = random.choice(self.proxy_sessions)
+                try:
+                    resp = await session.get(url, headers=headers, params=params)
+                    break
+                except RequestFailedException:
+                    try:
+                        await session.close()
+                        self.proxy_sessions.remove(session)
+                    except:
+                        pass
+        else:
+            resp = await self.session.get(url, headers=headers, params=params)
         resp.raise_for_status()
         return TitleEndpointsResponse.parse_raw(await resp.text())
 
@@ -108,9 +124,24 @@ class AuthenticationManager:
         data["client_id"] = self._client_id
         if self._client_secret:
             data["client_secret"] = self._client_secret
-        resp = await self.session.post(
-            "https://login.live.com/oauth20_token.srf", data=data
-        )
+        if self.proxy_sessions:
+            while True:
+                session = random.choice(self.proxy_sessions)
+                try:
+                    resp = await session.post(
+                        "https://login.live.com/oauth20_token.srf", data=data
+                    )
+                    break
+                except RequestFailedException:
+                    try:
+                        await session.close()
+                        self.proxy_sessions.remove(session)
+                    except:
+                        pass
+        else:
+            resp = await self.session.post(
+                "https://login.live.com/oauth20_token.srf", data=data
+            )
         # print(await resp.content.read())
         resp.raise_for_status()
         return OAuth2TokenResponse.parse_raw(await resp.text())
@@ -134,8 +165,20 @@ class AuthenticationManager:
                 else f"d={self.oauth.access_token}",
             },
         }
-
-        resp = await self.session.post(url, json=data, headers=headers)
+        if self.proxy_sessions:
+            while True:
+                session = random.choice(self.proxy_sessions)
+                try:
+                    resp = await session.post(url, json=data, headers=headers)
+                    break
+                except RequestFailedException:
+                    try:
+                        await session.close()
+                        self.proxy_sessions.remove(session)
+                    except:
+                        pass
+        else:
+            resp = await self.session.post(url, json=data, headers=headers)
         resp.raise_for_status()
         return XAUResponse.parse_raw(await resp.text())
 
@@ -153,8 +196,20 @@ class AuthenticationManager:
                 "SandboxId": "RETAIL",
             },
         }
-
-        resp = await self.session.post(url, json=data, headers=headers)
+        if self.proxy_sessions:
+            while True:
+                session = random.choice(self.proxy_sessions)
+                try:
+                    resp = await session.post(url, json=data, headers=headers)
+                    break
+                except RequestFailedException:
+                    try:
+                        await session.close()
+                        self.proxy_sessions.remove(session)
+                    except:
+                        pass
+        else:
+            resp = await self.session.post(url, json=data, headers=headers)
         if(resp.status == 401): # if unauthorized
             print('Failed to authorize you! Your password or username may be wrong or you are trying to use child account (< 18 years old)')
             raise AuthenticationException()

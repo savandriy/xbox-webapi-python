@@ -106,7 +106,7 @@ class Achievement(CamelCaseModel):
     participation_type: str
     time_window: Any
     rewards: List[Reward]
-    estimated_time: time
+    estimated_time: str
     deeplink: Any
     is_revoked: bool
 

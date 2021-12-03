@@ -78,9 +78,19 @@ class Session:
             data = data or {}
             data.update(extra_data)
 
-        return await self._auth_mgr.session.request(
-            method, url, **kwargs, headers=headers, params=params, data=data
-        )
+        session = kwargs.pop("session", None)
+
+        if session is None:
+            if self._auth_mgr.session is None:
+                raise Exception('Failed! If AuthenticationManager is created with proxy_sesssions session for requsts '
+                                'should be passed explicitly, through "session" argument')
+            return await self._auth_mgr.session.request(
+                method, url, **kwargs, headers=headers, params=params, data=data
+            )
+        else:
+            return await session.request(
+                method, url, **kwargs, headers=headers, params=params, data=data
+            )
 
     async def get(self, url: str, **kwargs: Any) -> ClientResponse:
         return await self.request(hdrs.METH_GET, url, **kwargs)

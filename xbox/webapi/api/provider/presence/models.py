@@ -18,7 +18,7 @@ class LastSeen(CamelCaseModel):
 class ActivityRecord(CamelCaseModel):
     richPresence: Optional[str]
     media: Optional[str]
-
+    
 class TitleRecord(CamelCaseModel):
     id: Optional[str]
     name: Optional[str]

@@ -16,7 +16,7 @@ async def async_main():
     tokens_file = "./tokens.json" # replace with path in auth scrip or just paste file with tokens here
     async with ClientSession() as session:
         auth_mgr = AuthenticationManager(
-              session, client_id, client_secret, ""
+            client_id, client_secret, "", client_session=session
         )
 
         try:
