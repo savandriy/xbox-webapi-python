@@ -7,6 +7,7 @@ import logging
 from typing import List, Optional
 import random
 
+import asyncio
 import aiohttp
 from yarl import URL
 
@@ -87,12 +88,9 @@ class AuthenticationManager:
                 try:
                     resp = await session.get(url, headers=headers, params=params)
                     break
-                except RequestFailedException:
-                    try:
-                        await session.close()
-                        self.proxy_sessions.remove(session)
-                    except:
-                        pass
+                except Exception as e:
+                    print(e)
+                    await asyncio.sleep(10)
         else:
             resp = await self.session.get(url, headers=headers, params=params)
         resp.raise_for_status()
@@ -132,12 +130,9 @@ class AuthenticationManager:
                         "https://login.live.com/oauth20_token.srf", data=data
                     )
                     break
-                except RequestFailedException:
-                    try:
-                        await session.close()
-                        self.proxy_sessions.remove(session)
-                    except:
-                        pass
+                except Exception as e:
+                    print(e)
+                    await asyncio.sleep(10)
         else:
             resp = await self.session.post(
                 "https://login.live.com/oauth20_token.srf", data=data
@@ -171,12 +166,9 @@ class AuthenticationManager:
                 try:
                     resp = await session.post(url, json=data, headers=headers)
                     break
-                except RequestFailedException:
-                    try:
-                        await session.close()
-                        self.proxy_sessions.remove(session)
-                    except:
-                        pass
+                except Exception as e:
+                    print(e)
+                    await asyncio.sleep(10)
         else:
             resp = await self.session.post(url, json=data, headers=headers)
         resp.raise_for_status()
@@ -202,12 +194,9 @@ class AuthenticationManager:
                 try:
                     resp = await session.post(url, json=data, headers=headers)
                     break
-                except RequestFailedException:
-                    try:
-                        await session.close()
-                        self.proxy_sessions.remove(session)
-                    except:
-                        pass
+                except Exception as e:
+                    print(e)
+                    await asyncio.sleep(10)
         else:
             resp = await self.session.post(url, json=data, headers=headers)
         if(resp.status == 401): # if unauthorized
