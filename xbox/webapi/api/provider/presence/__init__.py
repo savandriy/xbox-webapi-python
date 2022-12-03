@@ -67,7 +67,7 @@ class PresenceProvider(BaseProvider):
             url, json=post_data, headers=self.HEADERS_PRESENCE, **kwargs
         )
         resp.raise_for_status()
-        parsed = PresenceBatchResponse.parse_raw(await resp.text())
+        parsed = PresenceBatchResponse.parse_raw(resp.text)
         return parsed.__root__
 
     async def get_presence_own(
