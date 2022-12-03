@@ -94,7 +94,7 @@ class AuthenticationManager:
         else:
             resp = await self.session.get(url, headers=headers, params=params)
         resp.raise_for_status()
-        return TitleEndpointsResponse.parse_raw(await resp.text())
+        return TitleEndpointsResponse.parse_raw(resp.text)
 
     async def request_oauth_token(self, authorization_code: str) -> OAuth2TokenResponse:
         """Request OAuth2 token."""
@@ -139,7 +139,7 @@ class AuthenticationManager:
             )
         # print(await resp.content.read())
         resp.raise_for_status()
-        return OAuth2TokenResponse.parse_raw(await resp.text())
+        return OAuth2TokenResponse.parse_raw(resp.text)
 
     async def request_user_token(
         self,
@@ -172,7 +172,7 @@ class AuthenticationManager:
         else:
             resp = await self.session.post(url, json=data, headers=headers)
         resp.raise_for_status()
-        return XAUResponse.parse_raw(await resp.text())
+        return XAUResponse.parse_raw(resp.text)
 
     async def request_xsts_token(
         self, relying_party: str = "http://xboxlive.com"
@@ -203,4 +203,4 @@ class AuthenticationManager:
             print('Failed to authorize you! Your password or username may be wrong or you are trying to use child account (< 18 years old)')
             raise AuthenticationException()
         resp.raise_for_status()
-        return XSTSResponse.parse_raw(await resp.text())
+        return XSTSResponse.parse_raw(resp.text)
