@@ -199,7 +199,7 @@ class AuthenticationManager:
                     await asyncio.sleep(10)
         else:
             resp = await self.session.post(url, json=data, headers=headers)
-        if(resp.status == 401): # if unauthorized
+        if(resp.status_code == 401): # if unauthorized
             print('Failed to authorize you! Your password or username may be wrong or you are trying to use child account (< 18 years old)')
             raise AuthenticationException()
         resp.raise_for_status()
